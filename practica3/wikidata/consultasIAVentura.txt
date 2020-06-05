@@ -1,0 +1,65 @@
+CONSULTA 1
+
+SELECT ?place
+WHERE
+{
+  wd:Q76364 wdt:P19 ?place
+}
+
+CONSULTA 2
+
+SELECT ?instrument ?instrumentLabel
+WHERE
+{
+  wd:Q76364 wdt:P1303 ?instrument
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
+}
+
+
+CONSULTA 3
+
+SELECT ?instrument ?instrumentLabel
+WHERE
+{
+  ?instrument wdt:P279 wd:Q57306162
+  {  select ?instrument
+     where{
+      wd:Q76364 wdt:P1303 ?instrument
+   }
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
+}
+
+CONSULTA 5
+
+SELECT DISTINCT ?film ?filmLabel
+WHERE
+{
+   ?film wdt:P86 wd:Q76364  
+   
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
+}
+ORDER BY ASC (?filmLabel)
+
+CONSULTA 6
+
+SELECT DISTINCT(count(*) as ?count)
+WHERE
+{
+   ?film wdt:P86 wd:Q76364  
+   
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
+}
+HAVING (COUNT(?film))
+
+CONSULTA 7 //TODO
+
+SELECT DISTINCT ?film ?filmLabel ?duration
+WHERE
+{
+   ?film p:P86 wd:Q76364;
+   ?film pq:P2047 ?duration;
+        # FILTER(?duration > 90 && ?duration < 120)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
+}
+ORDER BY ASC (?filmLabel)
