@@ -52,14 +52,63 @@ WHERE
 }
 HAVING (COUNT(?film))
 
-CONSULTA 7 //TODO
+CONSULTA 7 
 
 SELECT DISTINCT ?film ?filmLabel ?duration
 WHERE
 {
-   ?film p:P86 wd:Q76364;
-   ?film pq:P2047 ?duration;
-        # FILTER(?duration > 90 && ?duration < 120)
+   ?film wdt:P86 wd:Q76364;
+   {select ?film ?duration where{
+     ?film wdt:P2047 ?duration;}}
+        FILTER(?duration > 90 && ?duration < 120)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
+}
+ORDER BY ASC (?filmLabel)
+
+CONSULTA 8 //TODO NO FUNCIONA EL GROUP BY CON LA FECHA
+
+SELECT DISTINCT ?film ?filmLabel ((MIN(?estreno)) as ?FechaEstreno)
+WHERE
+{
+   ?film wdt:P86 wd:Q76364;
+   {select ?film ?estreno where{
+     ?film wdt:P577 ?estreno;}}
+      
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
+}
+GROUP BY (?filmLabel)
+ORDER BY ASC (?filmLabel)
+
+CONSULTA 9 //TODO COMPROBAR SI FUNCIONA BIEN, A MI ME DA ERROR POR QUE SE AGOTA EL TIEMPO DE CONSULTA
+
+SELECT DISTINCT ?film ?filmLabel ?compositor ?fechaNacimiento ?fechaDefuncion
+WHERE
+{
+   ?film wdt:P86 wd:Q76364;
+   {select distinct ?compositor  ?fechaNacimiento ?fechaDefuncion where{
+     ?compositor wdt:P86 ?film;
+    
+     {select distinct ?fechaNacimiento ?fechaDefuncion where{
+       ?compositor wdt:P569 ?fechaNacimiento;
+                   wdt:P570 ?fechaDefuncion;}
+     }
+   }
+   }
+      
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
+}
+ORDER BY ASC (?filmLabel)
+
+CONSULTA 10 //TODO NO FUNCIONA PERO PUEDE SERVIR DE ESQUEMA
+
+SELECT DISTINCT ?total
+WHERE
+{
+   ?ASERTOSUNO ?CUALQUIERA wd:Q76364;
+   {SELECT ?ASERTOSDOS WHERE{
+      wd:Q76364 ?CUALQUIERA ?ASERTOSDOS;}}
+  
+   BIND ((COUNT(?ASERTOSUNO)) + (COUNT(?ASERTOSDOS)) AS ?total) 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
 }
 ORDER BY ASC (?filmLabel)
